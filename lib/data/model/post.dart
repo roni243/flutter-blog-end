@@ -1,12 +1,14 @@
 import 'package:flutter_blog/data/model/user.dart';
 
 class Post {
-  final int id;
-  final String title;
-  final String content;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final User user;
+  int id;
+  String title;
+  String content;
+  DateTime createdAt;
+  DateTime updatedAt;
+  User user;
+  int bookmarkCount; // PostListPage 만들다가 보니 필요함
+  bool? isBookmark;
 
   Post({
     required this.id,
@@ -15,6 +17,8 @@ class Post {
     required this.createdAt,
     required this.updatedAt,
     required this.user,
+    required this.bookmarkCount,
+    this.isBookmark
   });
 
   Post.fromMap(Map<String, dynamic> data)
@@ -23,5 +27,7 @@ class Post {
         content = data['content'],
         createdAt = DateTime.parse(data['createdAt']),
         updatedAt = DateTime.parse(data['updatedAt']),
+        bookmarkCount = data['bookmarkCount'],
+        isBookmark = data['isBookmark'],
         user = User.fromMap(data['user']);
 }

@@ -135,7 +135,7 @@ class SessionGVM extends Notifier<SessionModel> {
   }
 }
 
-/// 3. 창고 데이터 타입 (불변 아님)
+// 3. 창고 데이터 타입 (불변 아님)
 class SessionModel {
   User? user;
   bool? isLogin;

@@ -6,29 +6,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final scaffoldKey = GlobalKey<ScaffoldState>();
 
-class PostListPage extends ConsumerWidget {
-
-  final refreshKey = GlobalKey<RefreshIndicatorState>();
+class PostListPage extends StatelessWidget {
 
   PostListPage();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
 
-    SessionModel model = ref.read(sessionProvider);
 
     return Scaffold(
       key: scaffoldKey,
       drawer: CustomNavigation(scaffoldKey),
       appBar: AppBar(
-        title: Text("Blog ${model.isLogin} ${model.user!.username}"),
+        title: Text("Blog"),
       ),
-      body: RefreshIndicator(
-        key: refreshKey,
-        onRefresh: () async {
-        },
-        child: PostListBody(),
-      ),
+      body: PostListBody(),
     );
   }
 }

@@ -26,6 +26,35 @@ class SessionGVM extends Notifier<SessionModel> {
     return SessionModel();
   }
 
+  Future<void> autoLogin() async {
+    String? accessToken = await secureStorage.read(key: "accessToken");
+
+    if(accessToken == null) {
+      Navigator.pushNamed(mContext, "/login"); //Splash 페이지 없애고 이동
+      return;
+    }
+
+    Map<String, dynamic> body = await UserRepository().autoLogin(accessToken);
+    if (!body["success"]) {
+      ScaffoldMessenger.of(mContext).showSnackBar(
+        SnackBar(content: Text("${body["errorMessage"]}")),
+      );
+      return;
+    }
+
+    User user = User.fromMap(body["response"]);
+    user.accessToken = accessToken;
+
+    state = SessionModel(user: user, isLogin: true);
+
+    // 유저에 토큰이 없다 바로넣기
+    dio.options.headers["Authorization"] = accessToken;
+
+    // 7. 게시글 목록 페이지 이동
+    Navigator.pushNamed(mContext, "/post/list");
+
+  }
+
   Future<void> join(String username, String email, String password) async {
     Logger().d("username : ${username}, email : ${email}, password : ${password}");
     bool isValid = ref.read(joinProvider.notifier).validate();
@@ -83,42 +112,6 @@ class SessionGVM extends Notifier<SessionModel> {
     Navigator.pushNamed(mContext, "/post/list");
   }
 
-  // Future<void> login(String username, String password) async {
-  //   // 1. 유효성 검사
-  //   Logger().d("username : ${username}, password : ${password}");
-  //   bool isValid = ref.read(loginProvider.notifier).validate();
-  //   if (!isValid) {
-  //     ScaffoldMessenger.of(mContext).showSnackBar(
-  //       SnackBar(content: Text("유효성 검사 실패입니다")),
-  //     );
-  //     return;
-  //   }
-  //
-  //   // 2. 통신
-  //   Map<String, dynamic> body = await UserRepository().login(username, password);
-  //   if (!body["success"]) {
-  //     ScaffoldMessenger.of(mContext).showSnackBar(
-  //       SnackBar(content: Text("${body["errorMessage"]}")),
-  //     );
-  //     return;
-  //   }
-  //
-  //   // 3. 파싱
-  //   User user = User.fromMap(body["response"]);
-  //
-  //   // 4. 토큰을 디바이스 저장
-  //   await secureStorage.write(key: "accessToken", value: user.accessToken);
-  //
-  //   // 5. 세션모델 갱신
-  //   state = SessionModel(user: user, isLogin: true);
-  //
-  //   // 5. dio의 header에 토큰 세팅
-  //   dio.options.headers["Authorization"] = user.accessToken;
-  //
-  //   // 6. 게시글 목록 페이지 이동
-  //   Navigator.pushNamed(mContext, "/post/list");
-  // }
-
   Future<void> logout() async {
     // 1. 토큰 디바이스 제거
     await secureStorage.delete(key: "accessToken");
@@ -131,7 +124,7 @@ class SessionGVM extends Notifier<SessionModel> {
 
     // 4. login 페이지 이동
     scaffoldKey.currentState!.openEndDrawer();
-    Navigator.pushNamed(mContext, "/login");
+    Navigator.pushNamedAndRemoveUntil(mContext, "/login", (route) => false);
   }
 }
 

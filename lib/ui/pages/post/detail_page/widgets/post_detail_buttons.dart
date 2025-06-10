@@ -5,6 +5,8 @@ import 'package:flutter_blog/data/model/post.dart';
 import 'package:flutter_blog/ui/pages/post/update_page/post_update_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../post_detail_vm.dart';
+
 class PostDetailButtons extends ConsumerWidget {
   Post post;
 
@@ -13,6 +15,7 @@ class PostDetailButtons extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionModel sessionModel = ref.read(sessionProvider);
+    PostDetailVM vm = ref.read(postDetailProvider(post.id).notifier);
 
     if (sessionModel.user!.id != post.user.id) {
       return SizedBox();
@@ -26,7 +29,7 @@ class PostDetailButtons extends ConsumerWidget {
           ),
           IconButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => PostUpdatePage()));
+              Navigator.push(context, MaterialPageRoute(builder: (_) => PostUpdatePage(post)));
             },
             icon: const Icon(CupertinoIcons.pen),
           ),
